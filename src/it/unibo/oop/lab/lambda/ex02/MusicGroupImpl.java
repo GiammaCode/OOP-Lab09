@@ -1,11 +1,13 @@
 package it.unibo.oop.lab.lambda.ex02;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -31,44 +33,61 @@ public final class MusicGroupImpl implements MusicGroup {
 
     @Override
     public Stream<String> orderedSongNames() {
-        return null;
+    	return songs.stream()
+    				.map(s-> s.getSongName())
+    				.sorted();
     }
 
     @Override
     public Stream<String> albumNames() {
-        return null;
+        return albums.keySet().stream();
     }
 
     @Override
     public Stream<String> albumInYear(final int year) {
-        return null;
+    	return albums.entrySet()
+    				 .stream()
+    				 .filter(a-> a.getValue().equals(year))
+    				 .map(a-> a.getKey());
     }
 
     @Override
     public int countSongs(final String albumName) {
-        return -1;
+        return (int) songs.stream()
+        			.filter(s-> s.getAlbumName().equals(albumName) &&
+        						s.getAlbumName().isPresent())
+        			.count();
     }
 
     @Override
     public int countSongsInNoAlbum() {
-        return -1;
+        return (int) songs.stream()
+        			.filter(s-> s.getAlbumName().isEmpty())
+        			.count();
     }
 
     @Override
     public OptionalDouble averageDurationOfSongs(final String albumName) {
-        return null;
+    	return songs.stream()       		 
+    			.filter(s-> s.getAlbumName().equals(albumName) &&
+						s.getAlbumName().isPresent())
+    			.mapToDouble(s-> s.getDuration())
+    			.average();
     }
 
     @Override
     public Optional<String> longestSong() {
-        return null;
+        return songs.stream()
+        		.max(Comparator.comparing(s-> s.getDuration()))
+        		.map(s-> s.getSongName());
     }
 
     @Override
     public Optional<String> longestAlbum() {
         return null;
     }
-
+    
+   /////////////////song class///////////////////////////////////
     private static final class Song {
 
         private final String songName;
