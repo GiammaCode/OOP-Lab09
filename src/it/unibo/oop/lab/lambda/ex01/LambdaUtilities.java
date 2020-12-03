@@ -1,7 +1,6 @@
 package it.unibo.oop.lab.lambda.ex01;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,9 +23,12 @@ import java.util.stream.IntStream;
  * Realize the three methods **WITHOUT** using the Stream library, but only leveraging the lambdas.
  *
  */
+
 public final class LambdaUtilities {
 
-    private LambdaUtilities() {
+
+
+	private LambdaUtilities() {
     }
 
     /**
@@ -82,23 +84,22 @@ public final class LambdaUtilities {
      *         based on the mapping done by the function
      */
     public static <R, T> Map<R, Set<T>> group(final List<T> list, final Function<T, R> op) {
-        /*
-         * Suggestion: consider Map.merge
-         */
-    	final Map<R, Set<T>> map = new HashMap<>(); 
-    	final Map<R, Set<T>> map1 = new HashMap<>();
+    	Map<R, Set<T>> map = new HashMap<>();
+    	
     	list.forEach(t-> {
-    		map.put(op.apply(t), new HashSet<>(Arrays.asList(t)));
-    	});
-    	map.forEach((key, value)-> 
-    		map1.merge(key, value, (t1,t2)->{
-    			t1.addAll(t2);
-    			return t2;
+    		R key = op.apply(t);
+    		if(map.get(key) == null) {
+    			Set<T> set = new HashSet<>();
+    			set.add(t);
+    			map.put(key, set);
     		}
-    		));
-        return map1;
+    		else {
+    			map.get(key).add(t);
+    		}
+    	});
+    	return map;
     }
-
+    
     /**
      * @param map
      *            input map
@@ -111,13 +112,18 @@ public final class LambdaUtilities {
      * @return a map whose non present values are filled with the value provided
      *         by the supplier
      */
-    public static <K, V> Map<K, V> fill(final Map<K, Optional<V>> map, final Supplier<V> def) {
-        /*
-         * Suggestion: consider Optional.orElse
-         * 
-         * Keep in mind that a map can be iterated through its forEach method
-         */
-        return null;
+	public static <K, V> Map<K, V> fill(final Map<K, Optional<V>> map, final Supplier<V> def) {
+    	final Map<K,V> map1 = new HashMap<>();
+    	
+    	map.forEach((key,value)-> {
+    		if(value.isEmpty()) {
+    			map1.put(key, value.orElseGet(def));
+    		}
+    		else {
+    			map1.put(key, value.get());
+    		}
+    	});
+        return map1;
     }
 
     /**
